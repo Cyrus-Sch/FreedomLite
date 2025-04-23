@@ -10,7 +10,7 @@
       "declarativeNetRequestWithHostAccess",
       "activeTab"
     ],
-    "host_permissions": ["<all_urls>"],
+    "host_permissions": ["<all_urls>", "sidePanel"],
   
     "background": {
       "service_worker": "background.js"
@@ -35,7 +35,9 @@
       "resources": ["blocked.html","/blocked.js"],
       "matches": ["<all_urls>"]
     }],
-  
-    "options_page": "options.html"
+    "options_page": "options.html",
+    "side_panel": {
+    "default_path": "sidepanel.html"
+  }
   }
   
