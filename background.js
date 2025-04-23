@@ -16,6 +16,24 @@ function makeRules(domains) {
   }));
 }
 
+chrome.sidePanel
+          .setPanelBehavior({ openPanelOnActionClick: true })
+          .catch((error) => console.error(error));
+
+// to find the windowId of the active tab
+let windowId;
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+  windowId = activeInfo.windowId;
+});
+
+// to receive messages from popup script
+chrome.runtime.onMessage.addListener((message, sender) => {
+  (async () => {
+    if (message.action === 'open_side_panel') {
+      chrome.sidePanel.open({ windowId: windowId });
+    }
+  })();
+});
   
   async function syncRules() {
     const { blockedDomains = [], blockingEnabled = true } =
