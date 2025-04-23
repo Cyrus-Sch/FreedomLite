@@ -1,0 +1,44 @@
+// Build a blocking rule for every domain the user saved
+function makeRules(domains) {
+    return domains.map((domain, i) => ({
+      id: i + 1,               // 1 … n  (must be unique positive ints)
+      priority: 1,
+      action: { type: "block" },
+      condition: {
+        urlFilter: `*://${domain}/*`,
+        resourceTypes: ["main_frame", "sub_frame"]
+      }
+    }));
+  }
+  
+  async function syncRules() {
+    const { blockedDomains = [], blockingEnabled = true } =
+      await chrome.storage.sync.get(["blockedDomains", "blockingEnabled"]);
+  
+    // Remove **all** old dynamic rules first
+    const current = await chrome.declarativeNetRequest.getDynamicRules();
+    const idsToRemove = current.map(r => r.id);
+    if (idsToRemove.length) {
+      await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: idsToRemove });
+    }
+  
+    // Add fresh rules only if blocking is ON
+    if (blockingEnabled && blockedDomains.length) {
+      const newRules = makeRules(blockedDomains);
+      await chrome.declarativeNetRequest.updateDynamicRules({ addRules: newRules });
+    }
+  }
+  
+  // Run once at install / update
+  chrome.runtime.onInstalled.addListener(syncRules);
+  
+  // Re-run whenever user edits the list or toggles blocking
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (
+      area === "sync" &&
+      (changes.blockedDomains !== undefined || changes.blockingEnabled !== undefined)
+    ) {
+      syncRules();
+    }
+  });
+  
