@@ -1,7 +1,9 @@
 const listEl  = document.getElementById("list");
 const inputEl = document.getElementById("domainInput");
 const formEl  = document.getElementById("addForm");
-const addFromCurrentDomain = document.getElementById("addFromCurrentDomainBtn")
+const addFromCurrentDomain = document.getElementById("addFromCurrentDomainBtn");
+const lockInput = document.querySelector('#num');
+const blockBtn = document.getElementById("blockBtn");
 
 async function render() {
   const { blockedDomains = [] } = await chrome.storage.sync.get("blockedDomains");
@@ -15,6 +17,32 @@ async function render() {
     listEl.appendChild(li);
   });
 }
+
+blockBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const minutes = num.valueAsNumber;
+  if (!Number.isFinite(minutes) || minutes <= 0) {
+    alert("Enter a positive number of minutes");   // guard-rail
+    return;
+  }
+  const { blockedDomains = [] } =
+    await chrome.storage.sync.get(["blockedDomains"]);
+
+  // use .length, not .Count
+  if (blockedDomains.length === 0) {
+    alert("Please add domains you want to block!")
+    await chrome.storage.sync.set({ lockStartTime: 0, lockAmount: -1 });
+    return;
+  }
+
+  // store both keys in one call
+  await chrome.storage.sync.set({
+    lockStartTime: Date.now(),
+    lockAmount: minutes,
+  });
+
+  location.reload();            // reload after everything is stored
+});
 
 // Add new domain
 formEl.addEventListener("submit", async e => {
