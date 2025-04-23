@@ -28,6 +28,12 @@ blockBtn.addEventListener("click", async (e) => {
   const { blockedDomains = [] } =
     await chrome.storage.sync.get(["blockedDomains"]);
 
+
+  const { blockingEnabled = true } = await chrome.storage.sync.get("blockingEnabled");
+  if (blockingEnabled == false){
+    alert("Please enable blocking!");
+    return
+  }
   // use .length, not .Count
   if (blockedDomains.length === 0) {
     alert("Please add domains you want to block!")
