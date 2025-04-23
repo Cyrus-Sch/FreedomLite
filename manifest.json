@@ -8,9 +8,10 @@
       "storage",
       "declarativeNetRequest",
       "declarativeNetRequestWithHostAccess",
-      "activeTab"
+      "activeTab",
+	  "sidePanel"
     ],
-    "host_permissions": ["<all_urls>", "sidePanel"],
+    "host_permissions": ["<all_urls>"],
   
     "background": {
       "service_worker": "background.js"
