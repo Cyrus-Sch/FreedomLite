@@ -36,9 +36,9 @@
       "resources": ["blocked.html","/blocked.js"],
       "matches": ["<all_urls>"]
     }],
-    "options_page": "options.html",
+    "options_page": "dynamicOptions.html",
     "side_panel": {
-    "default_path": "options.html"
+    "default_path": "dynamicOptions.html"
   }
   }
   
