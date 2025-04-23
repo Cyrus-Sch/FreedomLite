@@ -1,15 +1,21 @@
 // Build a blocking rule for every domain the user saved
 function makeRules(domains) {
-    return domains.map((domain, i) => ({
-      id: i + 1,               // 1 … n  (must be unique positive ints)
-      priority: 1,
-      action: { type: "block" },
-      condition: {
-        urlFilter: `*://${domain}/*`,
-        resourceTypes: ["main_frame", "sub_frame"]
+  return domains.map((domain, i) => ({
+    id: i + 1,
+    priority: 1,
+    action: {
+      type: "redirect",
+      redirect: {          // show our own page
+        extensionPath: "/blocked.html"
       }
-    }));
-  }
+    },
+    condition: {
+      urlFilter: `||${domain}^`,   // match domain *and* any sub-domains
+      resourceTypes: ["main_frame"]// only full-page navigations
+    }
+  }));
+}
+
   
   async function syncRules() {
     const { blockedDomains = [], blockingEnabled = true } =
